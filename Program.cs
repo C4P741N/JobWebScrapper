@@ -19,19 +19,30 @@ class Program
     {
         List<string> val = new List<string>();
         Prs pr = new Prs();
-       
 
-        while (true)
+
+        try
         {
-            pr.lines = ReadExistingValues();
+            while (true)
+            {
+                if (pr.lines == null)
+                    pr.lines = ReadExistingValues();
 
-            pr.sWriter = new StreamWriter(szxPATH);
+                if (pr.sWriter == null)
+                    pr.sWriter = new StreamWriter(szxPATH);
 
-            WriteToFileIf(pr);
+                pr.pageCounter = 1;
 
-            pr.sWriter.Flush();
+                WriteToFileIf(pr);
 
-            Thread.Sleep(nxMINUTE);
+                pr.sWriter.Flush();
+
+                Thread.Sleep(nxMINUTE);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
         }
     }
 
@@ -55,6 +66,8 @@ class Program
 
                 foreach (HtmlNode node in parentNode)
                 {
+                    Console.Write("...");
+
                     pr.node = node;
 
                     bScanPage = LogEntryIf(pr);
@@ -92,15 +105,15 @@ class Program
                         Console.Write($" [New entry on Page {pr.pageCounter}] ");
 
                         pr.sWriter?.WriteLine("[New]");
-                        pr.lines.Add(entry);
                     }
+
+                    pr.lines.Add(entry);
 
                     Console.Write($"{pr.pageCounter}.{pr.counter}...");
 
                     pr.sWriter?.WriteLine(entry);
                     pr.counter++;
                 }
-
             }
         }
         else
